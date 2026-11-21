@@ -7,5 +7,6 @@
 //   vanta(500).then(() => console.log("500 ms har gått"));
 
 export function vanta(ms: number): Promise<void> {
-  // TODO
+  // setTimeout anropar resolve efter ms millisekunder, och då blir promisen klar.
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
 }
