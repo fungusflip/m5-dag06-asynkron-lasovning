@@ -13,26 +13,26 @@ Förklaring:
 
 | Steg | Vad händer | Stacken | Microtask-kön | Task-kön | Utskrift hittills |
 |---|---|---|---|---|---|
-| 1 | setTimeout anropas | | | | |
-| 2 | Promise.resolve().then(...) anropas | | | | |
-| 3 | console.log("sync") | | | | |
-| 4 | Stacken tom: vad körs först? | | | | |
-| 5 | Nästa | | | | |
+| 1 | setTimeout anropas | setTimeout (startar timern, sedan klar) | tom | timeout-callbacken (väntar på 0 ms) | inget |
+| 2 | Promise.resolve().then(...) anropas | Promise.resolve().then | promise-callbacken | timeout-callbacken | inget |
+| 3 | console.log("sync") | console.log("sync") | promise-callbacken | timeout-callbacken | sync |
+| 4 | Stacken tom: vad körs först? | promise-callbacken (microtask först) | tom | timeout-callbacken | sync, promise |
+| 5 | Nästa | timeout-callbacken (nu får tasken köra) | tom | tom | sync, promise, timeout |
 
 ## Snutt 10
 
 | Steg | Vad händer | Stacken | Microtask-kön | Task-kön | Utskrift hittills |
 |---|---|---|---|---|---|
-| 1 | console.log("1") | | | | |
-| 2 | första setTimeout | | | | |
-| 3 | Promise.resolve().then(3) | | | | |
-| 4 | andra setTimeout | | | | |
-| 5 | console.log("6") | | | | |
-| 6 | stacken tom, microtask-kön först | | | | |
-| 7 | första tasken | | | | |
-| 8 | andra tasken | | | | |
-| 9 | microtask 5 | | | | |
+| 1 | console.log("1") | console.log("1") | tom | tom | 1 |
+| 2 | första setTimeout | setTimeout | tom | task A (skriver 2) | 1 |
+| 3 | Promise.resolve().then(3) | Promise.resolve().then | microtask 3 | task A | 1 |
+| 4 | andra setTimeout | setTimeout | microtask 3 | task A, task B (skriver 4) | 1 |
+| 5 | console.log("6") | console.log("6") | microtask 3 | task A, task B | 1, 6 |
+| 6 | stacken tom, microtask-kön först | microtask 3 | tom | task A, task B | 1, 6, 3 |
+| 7 | första tasken | task A (skriver 2) | tom | task B | 1, 6, 3, 2 |
+| 8 | andra tasken | task B (skriver 4, lägger microtask 5 i kön) | microtask 5 | tom | 1, 6, 3, 2, 4 |
+| 9 | microtask 5 | microtask 5 (skriver 5) | tom | tom | 1, 6, 3, 2, 4, 5 |
 
 ## Min förklaring i en mening
 
-Varför kommer en promise-callback före en timer med 0 ms?
+Varför kommer en promise-callback före en timer med 0 ms? För att när stacken är tom tömmer JavaScript hela microtask-kön först, och timerns callback ligger i task-kön och får vänta tills microtasks är slut.
