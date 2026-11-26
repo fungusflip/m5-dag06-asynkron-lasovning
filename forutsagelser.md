@@ -20,7 +20,7 @@ Jag skriver pil (→) mellan utskrifterna istället för streck, annars går tab
 | 7 | fel: slut på mjölk → städar | fel: slut på mjölk → städar | Rätt | Ett reject hoppar över alla `then` tills det kommer en `catch`. `finally` körs sist oavsett. |
 | 8 | beställer → sätter mig → bullen klar → kaffet klart | beställer → sätter mig → bullen klar → kaffet klart | Rätt | Båda timers startar samtidigt, så den kortaste blir klar först, inte den som beställdes först. |
 | 9 | väntar på båda → ["kaffe","bulle"] | väntar på båda → ["kaffe","bulle"] | Rätt | `Promise.all` väntar på den långsammaste, och listan har samma ordning som in-listan, inte i den ordning de blev klara. |
-| 10 | 1 → 6 → 3 → 2 → 4 → 5 | 1 → 6 → 3 → 2 → 4 → 5 | Rätt | Först sync, sedan microtasks, sedan en timer. En microtask som skapas inuti en timer (5) körs direkt när den timern är slut, före nästa timer. Här är 5 sist bara för att det inte finns fler timers. |
+| 10 | 1 → 6 → 3 → 2 → 4 → 5 | 1 → 6 → 3 → 2 → 4 → 5 | Rätt | Först sync, sedan microtasks, sedan en timer. En microtask som skapas inuti en timer (5) körs direkt när den timern är slut, före nästa timer. |
 | 11 | c → ab | c → ab | Rätt | När ett `then` returnerar en promise väntar nästa `then` på den. Det blir `ab` först efter 50 ms. |
 
 Jag hade rätt på alla elva. Jag la därför regeln i sista kolumnen som en kom-ihåg även när jag gissade rätt. Det jag var mest osäker på var snutt 10, om 5 skulle komma före 4 eller efter. Det blir efter, för 5 skapas inuti task 4 och körs först när den är klar.
